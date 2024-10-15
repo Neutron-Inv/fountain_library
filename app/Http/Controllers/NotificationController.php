@@ -23,7 +23,7 @@ class NotificationController extends Controller
         $user = $request->user();
         $userId = $user->id;
         $role = $user->role;
-
+        
         // Initialize school_id
         $school_id = null;
 
@@ -49,6 +49,7 @@ class NotificationController extends Controller
                                          $query->where('group', 'all')
                                                ->orWhere('group', $role);
                                      })
+                                     ->orWhere('user_id', $userId)
                                      ->get();
 
         // Structure the JSON response
@@ -59,6 +60,7 @@ class NotificationController extends Controller
                 'from' => $notification->from,
                 'till' => $notification->till,
                 'message' => $notification->message,
+                'created_at' => $notification->created_at
             ];
         });
 

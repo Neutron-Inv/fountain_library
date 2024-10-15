@@ -14,5 +14,6 @@ class Subject_Routing extends Model
         'school_id',
         'grade_id',
         'subject_id',
+        'teacher_id'
     ];
 }

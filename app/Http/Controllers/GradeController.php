@@ -3,6 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\Grade;
+use App\Models\Student;
+use App\Models\Admin;
+use App\Models\Teacher;
 use Illuminate\Http\Request;
 
 class GradeController extends Controller
@@ -12,11 +15,24 @@ class GradeController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index($id)
+    public function index(Request $request)
     {
-
+        // Get the authenticated user
+        $userId = $request->user();
+        
+        $role = $userId->role; // Adjust based on how role is stored/retrieved
+        
+        $school_id = 0;
+        
+        if($role == 'student'){
+            $school_id = Student::where('user_id', $userId->id)->pluck('school_id')->first();
+        } elseif($role == 'admin'){
+            $school_id = Admin::where('user_id', $userId->id)->pluck('school_id')->first();
+        } elseif($role == 'teacher'){
+            $school_id = Teacher::where('user_id', $userId->id)->pluck('school_id')->first();
+        }
         // Retrieve all grade_name values for the specified school_id
-        $grades = Grade::where('school_id', $id)
+        $grades = Grade::where('school_id', $school_id)
         ->select('id','grade_name')
         ->get();
 

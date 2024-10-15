@@ -3,7 +3,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserController;
-use App\Http\Controllers\{GradeController, SubjectController, SubjectRoutingController, SubjectTopicController, ArmController, TopicController, DashboardController,CommentController, NotificationController, TeacherController};
+use App\Http\Controllers\{GradeController, SubjectController, SubjectRoutingController, SubjectTopicController, ArmController, TopicController, DashboardController,CommentController, NotificationController, TeacherController, StudentController};
 
 /*
 |--------------------------------------------------------------------------
@@ -56,8 +56,10 @@ Route::prefix('subject')->group(function () {
     Route::get('/create/{id}', [SubjectController::class, 'create']);
     Route::get('/fetch', [SubjectController::class, 'index']);
     Route::get('/show/{id}', [SubjectController::class, 'fetch']);
-    Route::put('/update/{schoolId}/{subjectId}', [SubjectController::class, 'update']);
+    Route::delete('/delete/{id}', [SubjectController::class, 'destroy']);
+    Route::post('/update/{subjectId}', [SubjectController::class, 'update']);
     Route::get('/student/fetch', [SubjectController::class, 'studentsubject']);
+    Route::get('/teacher/fetch', [SubjectController::class, 'teachersubject']);
     Route::post('/topic/create', [SubjectTopicController::class, 'store']);
     Route::get('/topic/fetch', [SubjectTopicController::class, 'index']);
 }); 
@@ -68,12 +70,13 @@ Route::prefix('topic')->group(function () {
     Route::get('/fetch/{id}', [TopicController::class, 'index']);
     Route::get('/student/fetch', [TopicController::class, 'sindex']);
     Route::get('/show/{id}', [TopicController::class, 'show']);
-    Route::put('/update/{id}', [TopicController::class, 'update']);
+    Route::delete('/delete/{id}', [TopicController::class, 'destroy']);
+    Route::post('/update/{id}', [TopicController::class, 'update']);
 }); 
 
 Route::prefix('grade')->group(function () {
     Route::post('/store', [GradeController::class, 'store']);
-    Route::get('/fetch/{id}', [GradeController::class, 'index']);
+    Route::get('/fetch', [GradeController::class, 'index']);
 });
 
 Route::prefix('dashboard')->group(function () {
@@ -98,6 +101,17 @@ Route::prefix('notifications')->group(function () {
 
 Route::prefix('teachers')->group(function () {
     Route::post('/create', [TeacherController::class, 'store']);
+    Route::get('/profile/{id}', [TeacherController::class, 'edit']);
+    Route::post('/update/{id}', [TeacherController::class, 'update']);
+    Route::delete('/delete/{id}', [TeacherController::class, 'destroy']);
+    Route::get('/fetch', [NotificationController::class, 'index']);
+});
+
+Route::prefix('students')->group(function () {
+    Route::post('/create', [StudentController::class, 'store']);
+    Route::get('/profile/{id}', [StudentController::class, 'edit']);
+    Route::post('/update/{id}', [StudentController::class, 'update']);
+    Route::delete('/delete/{id}', [StudentController::class, 'destroy']);
     Route::get('/fetch', [NotificationController::class, 'index']);
 });
 

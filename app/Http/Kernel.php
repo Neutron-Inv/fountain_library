@@ -50,6 +50,7 @@ class Kernel extends HttpKernel
             'throttle:api',
             \Illuminate\Routing\Middleware\SubstituteBindings::class,
             \App\Http\Middleware\Cors::class,
+            //\Fruitcake\Cors\HandleCors::class,
             //\Laravel\Passport\Http\Middleware\CreateFreshApiToken::class,
         ],
     ];

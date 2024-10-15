@@ -11,7 +11,8 @@ class Cors
         
         $allowedOrigins = [
         'https://fountainlibrary.vercel.app',
-        'http://localhost:3000'
+        'http://localhost:3000',
+        'https://fountainlibrary.com'
     ];
 
     $origin = $request->headers->get('Origin');

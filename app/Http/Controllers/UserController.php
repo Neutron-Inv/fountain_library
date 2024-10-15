@@ -21,9 +21,9 @@ class UserController extends Controller
             'first_name' => 'required|string|max:255',
             'last_name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
-            'phone' => 'required|string',
+            'phone' => 'nullable|string',
             'role' => 'required|string|max:255',
-            'username' => 'required|string|max:255|unique:users',
+            'username' => 'nullable|string|max:255|unique:users',
             'password' => 'required|string|min:8|confirmed',
         ]);
 
@@ -95,6 +95,10 @@ class UserController extends Controller
 
         if (Auth::attempt($credentials)) {
             $user_details = User::where('email', $credentials['email'])->first();
+            
+            if($user_details->role =="teacher"){
+                $user_details['teacher_id'] = Teacher::select('id')->where('user_id', $user_details->id)->value('id');
+            }
             $token = Auth::user()->createToken('authToken')->plainTextToken;
             return response()->json(['token' => $token, 'user' => $user_details], 200);
         }
@@ -159,13 +163,15 @@ class UserController extends Controller
         ->leftjoin('users', 'students.user_id','=','users.id')
         ->select(
             'students.id as student_id',
+            'users.id as user_id',
             'students.first_name as first_name',
             'students.last_name as last_name',
             'students.dob as dob',
             'students.gender as gender',
             'grades.grade_name as grade',
             \DB::raw('"student" as role'),
-            'users.email as email'
+            'users.email as email',
+            'users.image as image'
             )
         ->where('students.school_id', $id)->get();
         
@@ -177,12 +183,14 @@ class UserController extends Controller
          $teachers = Teacher::leftjoin('users', 'teachers.user_id','=','users.id')
          ->select(
             'teachers.id as teacher_id',
+            'users.id as user_id',
             'teachers.first_name as first_name',
             'teachers.last_name as last_name',
             'teachers.dob as dob',
             'teachers.gender as gender',
             \DB::raw('"teacher" as role'),
-            'users.email as email'
+            'users.email as email',
+            'users.image as image'
         )
         ->where('school_id', $id)->get();
         
@@ -193,13 +201,15 @@ class UserController extends Controller
     {  
         $admin = Admin::leftjoin('users', 'admins.user_id','=','users.id')
          ->select(
-            'admins.id as teacher_id',
+            'admins.id as admin_id',
+            'users.id as user_id',
             'admins.first_name as first_name',
             'admins.last_name as last_name',
             'admins.phone as phone',
             'admins.gender as gender',
             \DB::raw('"admin" as role'),
-            'users.email as email'
+            'users.email as email',
+            'users.image as image'
         )
         ->where('school_id', $id)->get();
         
