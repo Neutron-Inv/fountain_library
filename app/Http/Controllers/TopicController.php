@@ -58,6 +58,7 @@ class TopicController extends Controller
             'grade_id' => 'nullable|exists:grades,id',
             'grade_ids' => 'nullable|array',
             'term_id' => 'required|string',
+            'school_id' => 'nullable|integer',
             'week' => 'nullable|integer',
             'title' => 'nullable|string|max:255',
             'introduction' => 'nullable|string',
@@ -156,6 +157,8 @@ class TopicController extends Controller
         $validated = $request->validate([
             'subject_id' => 'required|exists:subjects,id',
             'week' => 'nullable|integer',
+            'term_id' => 'nullable|integer',
+            'school_id' => 'nullable|integer',
             'title' => 'required|string|max:255',
             'introduction' => 'nullable|string',
             'video' => 'nullable|file|mimes:mp4,mov,avi,wmv|max:204800', // Max 20MB
@@ -193,7 +196,7 @@ class TopicController extends Controller
             }
             $coverfile = $request->file('cover');
             $coverName = pathinfo($coverfile->getClientOriginalName(), PATHINFO_FILENAME) . '_' . Carbon::now()->timestamp . '.' . $coverfile->getClientOriginalExtension();
-            $path = $coverfile->storeAs('files', $coverName, 'public');
+            $path = $coverfile->storeAs('covers', $coverName, 'public');
             $validated['cover'] = Storage::disk('public')->url($path);
         }else{
             $validated['cover'] = $topic->cover;
