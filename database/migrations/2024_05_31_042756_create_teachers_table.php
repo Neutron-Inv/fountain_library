@@ -22,7 +22,7 @@ class CreateTeachersTable extends Migration
             $table->string('last_name');
             $table->string('email')->unique();
             $table->string('number');
-            $table->text('gender');
+            $table->text('address');
             $table->timestamps();
         });
     }

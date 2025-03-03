@@ -1,7 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-
+use Illuminate\Support\Facades\Response;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -21,3 +21,9 @@ Route::get('/run-storage-link', function () {
     Artisan::call('storage:link');
     return Artisan::output();
 });
+
+Route::get('/clear-cache', function () {
+    Artisan::call('optimize:clear');
+    return Artisan::output();
+});
+

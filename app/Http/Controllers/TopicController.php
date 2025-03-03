@@ -57,12 +57,13 @@ class TopicController extends Controller
             'subject_id' => 'required|exists:subjects,id',
             'grade_id' => 'nullable|exists:grades,id',
             'grade_ids' => 'nullable|array',
-            'term_id' => 'nullable|string',
+            'term_id' => 'required|string',
             'week' => 'nullable|integer',
             'title' => 'nullable|string|max:255',
             'introduction' => 'nullable|string',
             'video' => 'nullable|file|mimes:mp4,mov,avi,wmv,mkv|max:2024000', // Max 100MB
             'file' => 'nullable|file|mimes:pdf,doc,docx,xls,xlsx,ppt,pptx,txt|max:102400', // Max 10MB
+            'cover' => 'nullable|file|mimes:jpg,jpeg,png,bmp,gif,webp,tiff,svg|max:102400', // Max 10MB
         ], $messages);
 
         \Log::info('Validation passed', ['validated' => $validated]);
@@ -83,6 +84,15 @@ class TopicController extends Controller
             $path = $file->storeAs('files', $fileName, 'public');
             $validated['file'] = Storage::disk('public')->url($path);
             \Log::info('File stored', ['path' => $path]);
+        }
+        
+        if ($request->hasFile('cover')) {
+            \Log::info('Cover file found');
+            $coverfile = $request->file('cover');
+            $coverName = 'cover_' . Carbon::now()->timestamp . '.' . $coverfile->getClientOriginalExtension();
+            $path = $coverfile->storeAs('covers', $coverName, 'public');
+            $validated['cover'] = Storage::disk('public')->url($path);
+            \Log::info('cover stored', ['path' => $path]);
         }
         
         $validated['grade_id'] = $validated['grade_ids'][0];
@@ -145,11 +155,12 @@ class TopicController extends Controller
         
         $validated = $request->validate([
             'subject_id' => 'required|exists:subjects,id',
-            'week' => 'required|integer',
+            'week' => 'nullable|integer',
             'title' => 'required|string|max:255',
             'introduction' => 'nullable|string',
             'video' => 'nullable|file|mimes:mp4,mov,avi,wmv|max:204800', // Max 20MB
             'file' => 'nullable|file|mimes:pdf,doc,docx,xls,xlsx,ppt,pptx|max:102400', // Max 10MB
+            'cover' => 'nullable|file|mimes:jpg,jpeg,png,bmp,gif,webp,tiff,svg|max:102400', // Max 10MB
         ]);
 
         if ($request->hasFile('video')) {
@@ -161,7 +172,7 @@ class TopicController extends Controller
             $path = $videoFile->storeAs('videos', $videoName, 'public');
             $validated['video'] = Storage::disk('public')->url($path);
         }else{
-            $validated['video'] = null;
+            $validated['video'] = $topic->video;
         }
 
         if ($request->hasFile('file')) {
@@ -173,7 +184,19 @@ class TopicController extends Controller
             $path = $file->storeAs('files', $fileName, 'public');
             $validated['file'] = Storage::disk('public')->url($path);
         }else{
-            $validated['file'] = null;
+            $validated['file'] = $topic->file;
+        }
+        
+        if ($request->hasFile('cover')) {
+            if ($topic->cover) {
+                Storage::disk('public')->delete($topic->cover);
+            }
+            $coverfile = $request->file('cover');
+            $coverName = pathinfo($coverfile->getClientOriginalName(), PATHINFO_FILENAME) . '_' . Carbon::now()->timestamp . '.' . $coverfile->getClientOriginalExtension();
+            $path = $coverfile->storeAs('files', $coverName, 'public');
+            $validated['cover'] = Storage::disk('public')->url($path);
+        }else{
+            $validated['cover'] = $topic->cover;
         }
 
         $topic->update($validated);
@@ -219,6 +242,10 @@ class TopicController extends Controller
             if ($topic->file) {
                 \Log::info('Deleting additional file', ['path' => $topic->file]);
                 Storage::disk('public')->delete(str_replace('/storage/', '', $topic->file));
+            }
+            if ($topic->cover) {
+                \Log::info('Deleting cover file', ['path' => $topic->cover]);
+                Storage::disk('public')->delete(str_replace('/storage/', '', $topic->cover));
             }
     
             // Delete the topic

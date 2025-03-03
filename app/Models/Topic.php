@@ -18,6 +18,7 @@ class Topic extends Model
         'introduction',
         'video',
         'file',
+        'cover',
     ];
 
     public function subject()

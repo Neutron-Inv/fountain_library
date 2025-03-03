@@ -17,11 +17,11 @@ class CreateStudentsTable extends Migration
             $table->id();
             $table->string('user_id');
             $table->string('school_id');
-            $table->string('reg_no');
+            $table->string('student_index');
             $table->string('first_name');
             $table->string('last_name');
             $table->string('dob');
-            $table->string('gender');
+            $table->string('address');
             $table->timestamps();
         });
     }

@@ -24,6 +24,7 @@ class CreateTopicsTable extends Migration
             $table->text('introduction')->nullable();
             $table->string('video')->nullable();
             $table->string('file')->nullable();
+            $table->string('cover')->nullable();
             $table->timestamps();
         });
     }
